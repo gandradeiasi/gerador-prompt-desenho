@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Prompt de Desenho</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f0f0f0, #ffffff);
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .menu button {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .prompt button {
+            background-color: #2196F3;
+            color: white;
+            margin-top: 20px;
+        }
+
+        .prompt img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            max-height: 300px;
+        }
+
+        .prompt h2 {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="menu">
+        <h1>Escolha a dificuldade:</h1>
+        <div class="buttons">
+            <button data-dificuldade="iniciante">Iniciante</button>
+            <button data-dificuldade="muitoFacil">Muito fácil</button>
+            <button data-dificuldade="facil">Fácil</button>
+            <button data-dificuldade="normal">Normal</button>
+            <button data-dificuldade="dificil">Difícil</button>
+            <button data-dificuldade="muitoDificil">Muito difícil</button>
+        </div>
+    </div>
+
+    <div class="container hidden" id="promptView">
+        <div id="promptContent" class="prompt"></div>
+        <button id="novaIdeia">Gerar nova ideia</button>
+    </div>
+
+    <script>
+        // JSON de configuração
+        const config = {
+            "personagens": {
+                "facil": [
+                    "Coragem, o Cão Covarde.webp",
+                    "Charmander.jpg",
+                    "Pikachu.png",
+                    "Mônica.jpg",
+                    "Lindinha.webp",
+                    "Mario.png",
+                    "Bart Simpson.png",
+                    "Piu-Piu.webp",
+                    "Lisa Simpson",
+                    "Jigglypuff.png",
+                    "Hello Kitty.webp"
+                ],
+                "medio": [
+                    "Naruto.webp",
+                    "Pica-Pau.png",
+                    "Timão.webp",
+                    "Goku.jpg",
+                    "Batman.jpg",
+                    "Sonic.webp",
+                    "Scooby-Doo.jpg",
+                    "Pernalonga.webp",
+                    "Pantera Cor-de-Rosa.png",
+                    "Docinho.png",
+                    "Florzinha.webp",
+                    "Kim Possible.png",
+                    "Betty Boop.webp",
+                    "Angélica.webp"
+                ],
+                "dificil": [
+                    "Ciborgue.webp",
+                    "Vegeta.png",
+                    "Wolverine.png",
+                    "Coringa.webp",
+                    "Thanos.jpg",
+                    "Bob Esponja.png",
+                    "Tom.webp",
+                    "Jerry.webp",
+                    "Mickey.jpg",
+                    "Ben 10.jpeg",
+                    "Ravena.webp",
+                    "Sakura.webp",
+                    "Wanda.webp",
+                    "Tempestade.png"
+                ]
+            },
+            "acao": [
+                "dançando",
+                "jogando bola",
+                "abrindo uma pacotinho de figurinhas",
+                "jogando pião",
+                "dando estrelinha",
+                "tomando achocolatado",
+                "brincando de pique esconde",
+                "pulando corda",
+                "jogando videogame",
+                "assistindo TV",
+                "andando de bicicleta",
+                "brincando num fliperama improvisado",
+                "ouvindo rádio",
+                "jogando bola de gude",
+                "fazendo colares com miçangas",
+                "montando quebra-cabeças",
+                "jogando dominó",
+                "fazendo gincanas",
+                "brincando de polícia e ladrão",
+                "inventando histórias",
+                "tocando instrumentos de brinquedo",
+                "assistindo clipes da MTV",
+                "conversando no MSN",
+                "entrando numa comunidade do Orkut",
+                "brincando com bonecos de ação",
+                "pulando amarelinha desenhada",
+                "fazendo corrida com carrinho de rolimã",
+                "fazendo bagunça",
+                "quebrando algo",
+                "fazendo acampamento",
+                "assistindo filmes em VHS",
+                "ouvindo fita cassete",
+                "ouvindo summer eletrohits",
+                "brincando de esconde-esconde",
+                "fazendo bolhas de sabão",
+                "jogando truco",
+                "construindo pistas para carrinhos",
+                "fazendo desenho com giz",
+                "experimentando doces feitos em casa",
+                "montando Lego",
+                "fazendo fantoches com meias",
+                "desenhando com lápis de cor",
+                "fazendo desenhos com canetinhas",
+                "inventando jogos de tabuleiro caseiros",
+                "construindo fortes com almofadas",
+                "participando de brincadeiras de roda",
+                "fazendo origami com papel colorido",
+                "contando histórias de terror",
+                "jogando mímica",
+                "fazendo trabalho de escola",
+                "pintando com aquarela",
+                "dançando quadrilha",
+                "correndo com os amigos",
+                "jogando futebol de botão",
+                "fazendo caretas",
+                "pulando no colchão",
+                "brincando de montar carrinhos com papelão",
+                "jogando batalha naval",
+                "cantando em um karaokê improvisado",
+                "jogando UNO",
+                "fazendo uma apresentação de talentos",
+                "experimentando sorvete de casquinha",
+                "ouvindo músicas em um discman",
+                "fazendo show de mágica",
+                "brincando de montar robôs de brinquedo",
+                "fazendo festas de aniversário surpresa",
+                "fazendo piquenique",
+                "experimentando refrigerante gelado",
+                "fazendo experiências culinárias",
+                "experimentando novos sabores de balas",
+                "construindo castelo de areia",
+                "escalando árvores",
+                "fazendo festa do pijama"
+            ],
+            "lugar": [
+                "na praia",
+                "no shopping",
+                "no cinema",
+                "na escola",
+                "no parque",
+                "na padaria",
+                "na casa da avó",
+                "na praça",
+                "na lanchonete da esquina",
+                "no campinho de futebol",
+                "na biblioteca da escola",
+                "no museu",
+                "na feira livre",
+                "no quiosque do bairro",
+                "na piscina comunitária",
+                "no parque aquático",
+                "na casa do amigo",
+                "na loja de brinquedos",
+                "no buffet infantil",
+                "no colégio",
+                "no mercado municipal",
+                "no parque de diversões",
+                "no acampamento de férias",
+                "na fazenda",
+                "no clube",
+                "na rua de casa",
+                "no campinho de vôlei",
+                "na pista de skate",
+                "no circuito de kart",
+                "no zoológico",
+                "no aquário",
+                "na estação de metrô",
+                "na praça de alimentação",
+                "na feira de antiguidades",
+                "no estádio",
+                "no teleférico",
+                "na escola de música",
+                "na pista de dança",
+                "na casa de praia",
+                "no mirante",
+                "no teatro municipal",
+                "no jardim botânico",
+                "na loja de discos",
+                "no sítio",
+                "na festa junina",
+                "no barzinho da família",
+                "no lago",
+                "na cachoeira",
+                "na pista de patinação",
+                "na área de camping",
+                "na rua do bairro",
+                "na pracinha",
+                "no parque infantil",
+                "na pista de bocha",
+                "na área de piquenique",
+                "no evento de animes",
+                "no evento de video games",
+                "na casa do amigo",
+                "na rua da escola",
+                "no parque temático"
+            ]
+        }
+
+        // Função para pegar um item aleatório de um array
+        function getRandomItem(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+
+        // Mapeamento das dificuldades para os tipos de prompt
+        const dificuldades = {
+            // Iniciante: personagem fácil aleatório, sem ação e lugar
+            iniciante: function () {
+                let personagem = getRandomItem(config.personagens.facil);
+                return { personagem, acao: null, lugar: null };
+            },
+            // Muito fácil: personagem médio aleatório, sem ação e lugar
+            muitoFacil: function () {
+                let personagem = getRandomItem(config.personagens.medio);
+                return { personagem, acao: null, lugar: null };
+            },
+            // Fácil: personagem fácil com ação aleatória, sem lugar
+            facil: function () {
+                let personagem = getRandomItem(config.personagens.facil);
+                let acao = getRandomItem(config.acao);
+                return { personagem, acao, lugar: null };
+            },
+            // Normal: personagem médio com ação aleatória, sem lugar
+            normal: function () {
+                let personagem = getRandomItem(config.personagens.medio);
+                let acao = getRandomItem(config.acao);
+                return { personagem, acao, lugar: null };
+            },
+            // Difícil: personagem fácil ou médio com ação e lugar aleatório
+            dificil: function () {
+                let grupo = [...config.personagens.facil, ...config.personagens.medio];
+                let personagem = getRandomItem(grupo);
+                let acao = getRandomItem(config.acao);
+                let lugar = getRandomItem(config.lugar);
+                return { personagem, acao, lugar };
+            },
+            // Muito difícil: personagem difícil com ação e lugar aleatório
+            muitoDificil: function () {
+                let personagem = getRandomItem(config.personagens.dificil);
+                let acao = getRandomItem(config.acao);
+                let lugar = getRandomItem(config.lugar);
+                return { personagem, acao, lugar };
+            }
+        };
+
+        // Seleciona elementos da tela
+        const menuEl = document.getElementById('menu');
+        const promptViewEl = document.getElementById('promptView');
+        const promptContentEl = document.getElementById('promptContent');
+        const novaIdeiaBtn = document.getElementById('novaIdeia');
+
+        // Evento para cada botão de dificuldade
+        document.querySelectorAll('#menu button').forEach(button => {
+            button.addEventListener('click', () => {
+                const dificuldade = button.getAttribute('data-dificuldade');
+                gerarPrompt(dificuldade);
+            });
+        });
+
+        // Função que gera o prompt e altera a tela
+        function gerarPrompt(dificuldadeKey) {
+            const resultado = dificuldades[dificuldadeKey]();
+            // Extraindo nome do personagem (removendo a extensão)
+            let nomePersonagem = resultado.personagem.replace(/\.[^/.]+$/, "");
+
+            // Cria a imagem do personagem
+            let imgHTML = `<img src="${resultado.personagem}" alt="${nomePersonagem}">`;
+            let promptTexto = '';
+
+            // Monta o texto do prompt de acordo com os dados disponíveis
+            if (resultado.acao && resultado.lugar) {
+                promptTexto = `<h2>${nomePersonagem} ${resultado.acao} ${resultado.lugar}</h2>`;
+            } else if (resultado.acao) {
+                promptTexto = `<h2>${nomePersonagem} ${resultado.acao}</h2>`;
+            } else {
+                promptTexto = `<h2>${nomePersonagem}</h2>`;
+            }
+
+            // Exibe a imagem e o texto com espaçamentos adequados
+            promptContentEl.innerHTML = imgHTML + promptTexto;
+
+            // Altera as telas
+            menuEl.classList.add('hidden');
+            promptViewEl.classList.remove('hidden');
+        }
+
+        // Botão para voltar à tela inicial
+        novaIdeiaBtn.addEventListener('click', () => {
+            promptViewEl.classList.add('hidden');
+            menuEl.classList.remove('hidden');
+        });
+    </script>
+</body>
+
+</html>
